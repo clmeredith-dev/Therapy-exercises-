@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Therapy Exercises</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  min-height: 100vh;
+}
+
+/* NAV */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.92);
+  border-bottom: 1px solid #e5e5ea;
+  padding: 0 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 54px;
+}
+.nav-title { font-size: 17px; font-weight: 600; }
+.nav-right { display: flex; gap: 8px; }
+.btn {
+  padding: 7px 14px; border-radius: 100px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: inherit; border: none;
+}
+.btn-gray  { background: #f0f0f5; color: #6e6e73; }
+.btn-green { background: #34c759; color: #fff; }
+.btn-blue  { background: #007aff; color: #fff; }
+
+/* PAGE */
+.page { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; }
+
+/* HERO */
+.hero {
+  background: #fff; border-radius: 20px; padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  margin-bottom: 32px;
+}
+.hero-label { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #6e6e73; margin-bottom: 6px; }
+.hero-nums { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 16px; }
+.hero-done { font-size: 48px; font-weight: 600; line-height: 1; color: #34c759; }
+.hero-total { font-size: 26px; color: #aeaeb2; padding-bottom: 3px; }
+.track { background: #f0f0f5; border-radius: 100px; height: 8px; margin-bottom: 8px; overflow: hidden; }
+.fill  { height: 100%; border-radius: 100px; background: linear-gradient(90deg,#34c759,#5ac8fa); transition: width 0.3s; }
+.track-labels { display: flex; justify-content: space-between; font-size: 12px; color: #6e6e73; }
+.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-top: 16px; }
+.stat { background: #f7f7f9; border-radius: 12px; padding: 12px; }
+.stat-label { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #6e6e73; margin-bottom: 4px; }
+.stat-val { font-size: 18px; font-weight: 600; color: #1d1d1f; }
+.stat-sub { font-size: 11px; color: #8e8e93; margin-top: 2px; }
+
+/* SECTION */
+.section { margin-bottom: 36px; }
+.section-head { margin-bottom: 14px; }
+.section-title { font-size: 22px; font-weight: 600; }
+.section-sub { font-size: 13px; color: #6e6e73; margin-top: 2px; }
+
+/* GRID — exact structure from working test */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+/* CARD */
+.card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.icon-wrap {
+  background: #f7f7f9;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #f0f0f5;
+}
+.icon-wrap svg { width: 110px; height: 110px; pointer-events: none; }
+
+.card-body {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+}
+
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+
+.ex-name {
+  font-size: 14px; font-weight: 600; line-height: 1.3;
+  outline: none; cursor: text; border-radius: 4px; padding: 1px 3px; margin: -1px -3px;
+}
+.ex-name:focus { box-shadow: 0 0 0 2px #007aff; }
+
+.ex-detail {
+  font-size: 12px; color: #6e6e73; line-height: 1.4;
+  outline: none; cursor: text; border-radius: 4px; padding: 1px 3px; margin: -1px -3px;
+  flex: 1;
+}
+.ex-detail:focus { box-shadow: 0 0 0 2px #007aff; }
+
+.badge {
+  font-size: 10px; font-weight: 700; padding: 2px 8px;
+  border-radius: 100px; white-space: nowrap; flex-shrink: 0;
+}
+
+.footer { margin-top: auto; padding-top: 8px; }
+
+.ref-link {
+  display: inline-block;
+  font-size: 11px; font-weight: 600; color: #007aff;
+  text-decoration: none; margin-bottom: 6px;
+}
+
+/* CHECKBOXES — exact pattern from working test */
+input[type="checkbox"] { display: none; }
+
+label.chklabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6e6e73;
+  cursor: pointer;
+  padding: 7px 0;
+  border-top: 1px solid #f0f0f5;
+}
+label.chklabel.last { color: #aeaeb2; font-weight: 500; font-size: 11px; }
+
+label.chklabel span.chk {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1.5px solid #d1d1d6;
+  background: #fff;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+input[type="checkbox"].today:checked + label.chklabel span.chk {
+  background: #34c759;
+  border-color: #34c759;
+}
+input[type="checkbox"].today:checked + label.chklabel span.chk::after {
+  content: "✓"; color: #fff; font-size: 15px; font-weight: bold;
+  display: flex; align-items: center; justify-content: center; height: 100%;
+}
+input[type="checkbox"].last:checked + label.chklabel span.chk {
+  background: #aeaeb2;
+  border-color: #aeaeb2;
+}
+input[type="checkbox"].last:checked + label.chklabel span.chk::after {
+  content: "✓"; color: #fff; font-size: 15px; font-weight: bold;
+  display: flex; align-items: center; justify-content: center; height: 100%;
+}
+
+@media (max-width: 600px) {
+  .stats { grid-template-columns: repeat(2,1fr); }
+  .nav-title { font-size: 15px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-title">Therapy Exercises</span>
+  <div class="nav-right">
+    <button class="btn btn-gray" onclick="resetAll()">Reset</button>
+    <button class="btn btn-green" onclick="finishSession()">Finish</button>
+    <button class="btn btn-blue" onclick="saveFile()">Save</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-label">Exercises Completed</div>
+    <div class="hero-nums">
+      <div class="hero-done" id="doneCount">0</div>
+      <div class="hero-total">of <span id="totalCount">12</span></div>
+    </div>
+    <div class="track"><div class="fill" id="progressFill" style="width:0%"></div></div>
+    <div class="track-labels">
+      <span id="progressPct">0% complete</span>
+      <span id="remainingLabel">12 remaining</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-label">Cardio</div><div class="stat-val" id="cardioStat">0/4</div><div class="stat-sub">Pick 1-2</div></div>
+      <div class="stat"><div class="stat-label">Mobility</div><div class="stat-val" id="mobilityStat">0/2</div><div class="stat-sub">Shoulders</div></div>
+      <div class="stat"><div class="stat-label">Strength</div><div class="stat-val" id="strengthStat">0/6</div><div class="stat-sub">To fatigue</div></div>
+      <div class="stat"><div class="stat-label">Last Session</div><div class="stat-val" id="lastSession">-</div><div class="stat-sub">Date</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">Cardio</div>
+      <div class="section-sub">Choose 1-2 that fit the day</div>
+    </div>
+    <div class="grid" id="cardio">
+    <div class="card" data-id="walker">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="14" r="7" fill="#007aff"></circle>
+          <path d="M40 21 L40 44" stroke="#007aff" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M40 30 L26 42 M40 30 L54 42" stroke="#007aff" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M40 44 L30 64 M40 44 L50 64" stroke="#007aff" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M22 52 L22 70" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M58 52 L58 70" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M22 52 L58 52" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <circle cx="18" cy="72" r="4" fill="#1d1d1f"></circle>
+          <circle cx="62" cy="72" r="4" fill="#1d1d1f"></circle>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="ex-name" id="name-walker" contenteditable="true" spellcheck="false" onblur="saveText('walker')">Walker — long distance</div>
+          <span class="badge" style="background:rgba(0,122,255,0.12);color:#007aff">Cardio</span>
+        </div>
+        <div class="ex-detail" id="detail-walker" contenteditable="true" spellcheck="false" onblur="saveText('walker')">Use the walker for longer-distance walking sessions.</div>
+        <div class="footer">
+          <a class="ref-link" href="https://www.mayoclinic.org/healthy-lifestyle/healthy-aging/in-depth/walker/art-20546805" target="_blank" rel="noopener">Mayo Clinic</a>
+          <input type="checkbox" class="today" id="today-walker">
+          <label class="chklabel" for="today-walker">Mark complete <span class="chk"></span></label>
+          <input type="checkbox" class="last" id="last-walker">
+          <label class="chklabel last" for="last-walker">Last session <span class="chk"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="card" data-id="bike">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="22" cy="56" r="14" stroke="#007aff" stroke-width="3.5"></circle>
+          <circle cx="58" cy="56" r="14" stroke="#007aff" stroke-width="3.5"></circle>
+          <path d="M22 56 L36 28 L52 28 L58 56" stroke="#1d1d1f" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M36 28 L30 56" stroke="#1d1d1f" stroke-width="3.5" stroke-linecap="round"></path>
+          <circle cx="36" cy="28" r="3.5" fill="#1d1d1f"></circle>
+          <path d="M52 28 L58 18 L66 18" stroke="#1d1d1f" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M28 22 L38 22" stroke="#007aff" stroke-width="3.5" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="ex-name" id="name-bike" contenteditable="true" spellcheck="false" onblur="saveText('bike')">Stationary bicycle</div>
+          <span class="badge" style="background:rgba(0,122,255,0.12);color:#007aff">Cardio</span>
+        </div>
+        <div class="ex-detail" id="detail-bike" contenteditable="true" spellcheck="false" onblur="saveText('bike')">Steady, seated pedaling at a comfortable pace.</div>
+        <div class="footer">
+          <a class="ref-link" href="https://torokhtiy.com/blogs/guides/stationary-bike-benefits-for-seniors" target="_blank" rel="noopener">How-to guide</a>
+          <input type="checkbox" class="today" id="today-bike">
+          <label class="chklabel" for="today-bike">Mark complete <span class="chk"></span></label>
+          <input type="checkbox" class="last" id="last-bike">
+          <label class="chklabel last" for="last-bike">Last session <span class="chk"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="card" data-id="rower">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 62 L70 62" stroke="#c7c7cc" stroke-width="3.5" stroke-linecap="round"></path>
+          <circle cx="44" cy="26" r="7" fill="#007aff"></circle>
+          <path d="M44 33 L28 50 L16 56" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M28 50 L52 46 L68 22" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path d="M68 22 L74 20" stroke="#007aff" stroke-width="3.5" stroke-linecap="round"></path>
+          <path d="M16 56 L10 58" stroke="#007aff" stroke-width="3.5" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="ex-name" id="name-rower" contenteditable="true" spellcheck="false" onblur="saveText('rower')">Rowing machine</div>
+          <span class="badge" style="background:rgba(0,122,255,0.12);color:#007aff">Cardio</span>
+        </div>
+        <div class="ex-detail" id="detail-rower" contenteditable="true" spellcheck="false" onblur="saveText('rower')">Smooth rowing strokes, controlled pace.</div>
+        <div class="footer">
+          <a class="ref-link" href="https://www.healthline.com/health/rowing-machine-benefits" target="_blank" rel="noopener">Healthline</a>
+          <input type="checkbox" class="today" id="today-rower">
+          <label class="chklabel" for="today-rower">Mark complete <span class="chk"></span></label>
+          <input type="checkbox" class="last" id="last-rower">
+          <label class="chklabel last" for="last-rower">Last session <span class="chk"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="card" data-id="poolwalk">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 66 Q18 58 28 66 T48 66 T68 66" stroke="#5ac8fa" stroke-width="3.5" stroke-linecap="round"></path>
+          <path d="M8 72 Q18 64 28 72 T48 72 T68 72" stroke="#5ac8fa" stroke-width="3" stroke-linecap="round" opacity="0.5"></path>
+          <circle cx="40" cy="18" r="7" fill="#007aff"></circle>
+          <path d="M40 25 L40 46" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M40 32 L28 42 M40 32 L52 34" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M40 46 L32 60 M40 46 L48 60" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="ex-name" id="name-poolwalk" contenteditable="true" spellcheck="false" onblur="saveText('poolwalk')">Pool Therapy</div>
+          <span class="badge" style="background:rgba(0,122,255,0.12);color:#007aff">Cardio</span>
+        </div>
+        <div class="ex-detail" id="detail-poolwalk" contenteditable="true" spellcheck="false" onblur="saveText('poolwalk')">Water walking for low-impact cardio.</div>
+        <div class="footer">
+          <a class="ref-link" href="https://www.mayoclinic.org/healthy-lifestyle/fitness/in-depth/aquatic-exercise/art-20546802" target="_blank" rel="noopener">Mayo Clinic</a>
+          <input type="checkbox" class="today" id="today-poolwalk">
+          <label class="chklabel" for="today-poolwalk">Mark complete <span class="chk"></span></label>
+          <input type="checkbox" class="last" id="last-poolwalk">
+          <label class="chklabel last" for="last-poolwalk">Last session <span class="chk"></span></label>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">Mobility</div>
+      <div class="section-sub">Shoulder stretches - 5 minutes</div>
+    </div>
+    <div class="grid" id="mobility">
+    <div class="card" data-id="pulleys">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 8 L60 8" stroke="#c7c7cc" stroke-width="4" stroke-linecap="round"></path>
+          <circle cx="40" cy="8" r="5" fill="#ff9500"></circle>
+          <circle cx="40" cy="8" r="9" stroke="#ff9500" stroke-width="2" opacity="0.3"></circle>
+          <path d="M34 14 Q20 26 20 42" stroke="#ff9500" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 3"></path>
+          <path d="M46 14 Q60 26 60 42" stroke="#ff9500" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 3"></path>
+          <circle cx="40" cy="32" r="7" fill="#007aff"></circle>
+          <path d="M40 39 L40 58" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M20 42 L34 46 M60 42 L46 46" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M40 58 L32 72 M40 58 L48 72" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="ex-name" id="name-pulleys" contenteditable="true" spellcheck="false" onblur="saveText('pulleys')">Over-the-door pulleys</div>
+          <span class="badge" style="background:rgba(255,149,0,0.12);color:#ff9500">Mobility</span>
+        </div>
+        <div class="ex-detail" id="detail-pulleys" contenteditable="true" spellcheck="false" onblur="saveText('pulleys')">Stretch shoulders for 5 minutes using the door pulley system.</div>
+        <div class="footer">
+          <a class="ref-link" href="https://mydoctor.kaiserpermanente.org/ncal/Images/._010526-018_tcm75-19098.pdf" target="_blank" rel="noopener">Kaiser PDF</a>
+          <input type="checkbox" class="today" id="today-pulleys">
+          <label class="chklabel" for="today-pulleys">Mark complete <span class="chk"></span></label>
+          <input type="checkbox" class="last" id="last-pulleys">
+          <label class="chklabel last" for="last-pulleys">Last session <span class="chk"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="card" data-id="canestretch">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="52" width="60" height="10" rx="5" fill="#f0f0f5" stroke="#c7c7cc" stroke-width="2"></rect>
+          <circle cx="28" cy="40" r="7" fill="#007aff"></circle>
+          <path d="M28 47 L28 54" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M28 54 L20 65 M28 54 L36 65" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M14 26 L66 26" stroke="#ff9500" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M28 47 L14 26" stroke="#1d1d1f" stroke-width="3.5" stroke-linecap="round"></path>
+          <path d="M28 47 L66 26" stroke="#1d1d1f" stroke-width="3.5" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="ex-name" id="name-canestretch" contenteditable="true" spellcheck="false" onblur="saveText('canestretch')">Stick stretch — lying on bed</div>
+          <span class="badge" style="background:rgba(255,149,0,0.12);color:#ff9500">Mobility</span>
+        </div>
+        <div class="ex-detail" id="detail-canestretch" contenteditable="true" spellcheck="false" onblur="saveText('canestretch')">Use a stick/cane lying on the bed to stretch shoulders.</div>
+        <div class="footer">
+          <a class="ref-link" href="https://www.hingehealth.com/resources/articles/shoulder-wand-exercises/" target="_blank" rel="noopener">Hinge Health</a>
+          <input type="checkbox" class="today" id="today-canestretch">
+          <label class="chklabel" for="today-canestretch">Mark complete <span class="chk"></span></label>
+          <input type="checkbox" class="last" id="last-canestretch">
+          <label class="chklabel last" for="last-canestretch">Last session <span class="chk"></span></label>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">Strength</div>
+      <div class="section-sub">Band or weights, work to fatigue</div>
+    </div>
+    <div class="grid" id="strength">
+    <div class="card" data-id="bicep">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="14" r="7" fill="#007aff"></circle>
+          <path d="M40 21 L40 44" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M40 30 L52 44" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M52 44 L52 28" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <rect x="46" y="20" width="13" height="9" rx="3" fill="#af52de"></rect>
+          <path d="M40 30 L28 40" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M40 44 L32 66 M40 44 L48 66" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="ex-name" id="name-bicep" contenteditable="true" spellcheck="false" onblur="saveText('bicep')">Bicep curls</div>
+          <span class="badge" style="background:rgba(175,82,222,0.12);color:#af52de">Strength</span>
+        </div>
+        <div class="ex-detail" id="detail-bicep" contenteditable="true" spellcheck="false" onblur="saveText('bicep')">5 lb weight, curl to fatigue.</div>
+        <div class="footer">
+          <a class="ref-link" href="https://www.getwellen.com/exercises/bicep-curls-with-band" target="_blank" rel="noopener">How-to guide</a>
+          <input type="checkbox" class="today" id="today-bicep">
+          <label class="chklabel" for="today-bicep">Mark complete <span class="chk"></span></label>
+          <input type="checkbox" class="last" id="last-bicep">
+          <label class="chklabel last" for="last-bicep">Last session <span class="chk"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="card" data-id="tricep">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="14" r="7" fill="#007aff"></circle>
+          <path d="M40 21 L40 44" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M40 26 L54 22" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M54 22 Q64 40 48 54" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M40 26 Q26 32 24 50" stroke="#af52de" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 3"></path>
+          <path d="M48 54 Q36 56 24 50" stroke="#af52de" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 3"></path>
+          <path d="M40 44 L32 66 M40 44 L48 66" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="ex-name" id="name-tricep" contenteditable="true" spellcheck="false" onblur="saveText('tricep')">Triceps pulldown with Rope</div>
+          <span class="badge" style="background:rgba(175,82,222,0.12);color:#af52de">Strength</span>
+        </div>
+        <div class="ex-detail" id="detail-tricep" contenteditable="true" spellcheck="false" onblur="saveText('tricep')">Wrap band around hands, extend at the elbow.</div>
+        <div class="footer">
+          <a class="ref-link" href="https://www.healthline.com/health/tricep-pushdown" target="_blank" rel="noopener">Healthline</a>
+          <input type="checkbox" class="today" id="today-tricep">
+          <label class="chklabel" for="today-tricep">Mark complete <span class="chk"></span></label>
+          <input type="checkbox" class="last" id="last-tricep">
+          <label class="chklabel last" for="last-tricep">Last session <span class="chk"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="card" data-id="overheadpress">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="40" cy="26" r="7" fill="#007aff"></circle>
+          <path d="M40 33 L40 54" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M40 40 L22 14 M40 40 L58 14" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <circle cx="22" cy="14" r="5" fill="#af52de"></circle>
+          <circle cx="58" cy="14" r="5" fill="#af52de"></circle>
+          <path d="M40 54 L32 70 M40 54 L48 70" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="ex-name" id="name-overheadpress" contenteditable="true" spellcheck="false" onblur="saveText('overheadpress')">Overhead press</div>
+          <span class="badge" style="background:rgba(175,82,222,0.12);color:#af52de">Strength</span>
+        </div>
+        <div class="ex-detail" id="detail-overheadpress" contenteditable="true" spellcheck="false" onblur="saveText('overheadpress')">Band, or 3 lb dumbbell, pressed overhead to fatigue.</div>
+        <div class="footer">
+          <a class="ref-link" href="https://www.healthline.com/health/shoulder-band-exercise" target="_blank" rel="noopener">Healthline</a>
+          <input type="checkbox" class="today" id="today-overheadpress">
+          <label class="chklabel" for="today-overheadpress">Mark complete <span class="chk"></span></label>
+          <input type="checkbox" class="last" id="last-overheadpress">
+          <label class="chklabel last" for="last-overheadpress">Last session <span class="chk"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="card" data-id="rows">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M68 10 L68 76" stroke="#c7c7cc" stroke-width="5" stroke-linecap="round"></path>
+          <circle cx="26" cy="34" r="7" fill="#007aff"></circle>
+          <path d="M26 41 L26 62" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M26 62 L18 74 M26 62 L34 74" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M26 46 Q48 46 68 38" stroke="#ff9500" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 3"></path>
+          <path d="M26 46 L12 42" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M12 42 L8 40" stroke="#af52de" stroke-width="3" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="ex-name" id="name-rows" contenteditable="true" spellcheck="false" onblur="saveText('rows')">Rowing Machine</div>
+          <span class="badge" style="background:rgba(175,82,222,0.12);color:#af52de">Strength</span>
+        </div>
+        <div class="ex-detail" id="detail-rows" contenteditable="true" spellcheck="false" onblur="saveText('rows')">Band anchored around a railing, pull to row.</div>
+        <div class="footer">
+          <a class="ref-link" href="https://www.healthline.com/health/rowing-machine-benefits" target="_blank" rel="noopener">Healthline</a>
+          <input type="checkbox" class="today" id="today-rows">
+          <label class="chklabel" for="today-rows">Mark complete <span class="chk"></span></label>
+          <input type="checkbox" class="last" id="last-rows">
+          <label class="chklabel last" for="last-rows">Last session <span class="chk"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="card" data-id="quads">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="22" y="12" width="30" height="36" rx="6" fill="#f0f0f5" stroke="#e5e5ea" stroke-width="1.5"></rect>
+          <circle cx="37" cy="22" r="7" fill="#007aff"></circle>
+          <path d="M37 29 L37 40" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M37 40 L37 50" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M37 50 L64 44" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <ellipse cx="67" cy="43" rx="5" ry="3.5" fill="none" stroke="#af52de" stroke-width="2.5"></ellipse>
+          <path d="M37 50 L30 72" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="ex-name" id="name-quads" contenteditable="true" spellcheck="false" onblur="saveText('quads')">Quads — seated leg extension</div>
+          <span class="badge" style="background:rgba(175,82,222,0.12);color:#af52de">Strength</span>
+        </div>
+        <div class="ex-detail" id="detail-quads" contenteditable="true" spellcheck="false" onblur="saveText('quads')">Band around ankle, seated in chair, extend the leg straight out.</div>
+        <div class="footer">
+          <a class="ref-link" href="https://www.hingehealth.com/resources/articles/resistance-band-exercises-for-seniors/" target="_blank" rel="noopener">Hinge Health</a>
+          <input type="checkbox" class="today" id="today-quads">
+          <label class="chklabel" for="today-quads">Mark complete <span class="chk"></span></label>
+          <input type="checkbox" class="last" id="last-quads">
+          <label class="chklabel last" for="last-quads">Last session <span class="chk"></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="card" data-id="hips">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="18" y="14" width="44" height="32" rx="6" fill="#f0f0f5" stroke="#e5e5ea" stroke-width="1.5"></rect>
+          <circle cx="40" cy="24" r="7" fill="#007aff"></circle>
+          <path d="M40 31 L40 42" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M40 42 L26 52 M40 42 L54 52" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <ellipse cx="40" cy="50" rx="20" ry="6" fill="none" stroke="#af52de" stroke-width="2.5"></ellipse>
+          <path d="M26 52 L22 72 M54 52 L58 72" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M22 62 L58 62" stroke="#ff2d55" stroke-width="2.5" stroke-dasharray="3 3" stroke-linecap="round"></path>
+        </svg>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="ex-name" id="name-hips" contenteditable="true" spellcheck="false" onblur="saveText('hips')">Hips — band around thighs</div>
+          <span class="badge" style="background:rgba(175,82,222,0.12);color:#af52de">Strength</span>
+        </div>
+        <div class="ex-detail" id="detail-hips" contenteditable="true" spellcheck="false" onblur="saveText('hips')">Band around thighs, knees together, pull knees apart and hold.</div>
+        <div class="footer">
+          <a class="ref-link" href="https://www.hingehealth.com/resources/articles/seated-hip-abduction/" target="_blank" rel="noopener">Hinge Health</a>
+          <input type="checkbox" class="today" id="today-hips">
+          <label class="chklabel" for="today-hips">Mark complete <span class="chk"></span></label>
+          <input type="checkbox" class="last" id="last-hips">
+          <label class="chklabel last" for="last-hips">Last session <span class="chk"></span></label>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var IDS = ['walker','bike','rower','poolwalk','pulleys','canestretch','bicep','tricep','overheadpress','rows','quads','hips'];
+var SECTIONS = {
+  walker:'cardio', bike:'cardio', rower:'cardio', poolwalk:'cardio',
+  pulleys:'mobility', canestretch:'mobility',
+  bicep:'strength', tricep:'strength', overheadpress:'strength',
+  rows:'strength', quads:'strength', hips:'strength'
+};
+
+function updateProgress() {
+  var done=0, cD=0, cT=0, mD=0, mT=0, sD=0, sT=0;
+  for (var i=0; i<IDS.length; i++) {
+    var id = IDS[i];
+    var box = document.getElementById('today-'+id);
+    var chk = box ? box.checked : false;
+    var sec = SECTIONS[id];
+    if (sec==='cardio')   { cT++; if(chk) cD++; }
+    if (sec==='mobility') { mT++; if(chk) mD++; }
+    if (sec==='strength') { sT++; if(chk) sD++; }
+    if (chk) done++;
+  }
+  var total = IDS.length;
+  var pct = Math.round((done/total)*100);
+  var e;
+  e=document.getElementById('doneCount');      if(e) e.textContent=done;
+  e=document.getElementById('totalCount');     if(e) e.textContent=total;
+  e=document.getElementById('cardioStat');     if(e) e.textContent=cD+'/'+cT;
+  e=document.getElementById('mobilityStat');   if(e) e.textContent=mD+'/'+mT;
+  e=document.getElementById('strengthStat');   if(e) e.textContent=sD+'/'+sT;
+  e=document.getElementById('progressFill');   if(e) e.style.width=pct+'%';
+  e=document.getElementById('progressPct');    if(e) e.textContent=pct+'% complete';
+  e=document.getElementById('remainingLabel'); if(e) e.textContent=(total-done)+' remaining';
+}
+
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.classList.contains('today')) updateProgress();
+});
+
+// Belt and suspenders for iOS — also catch via label clicks
+var allLabels = document.querySelectorAll('label.chklabel');
+for (var li=0; li<allLabels.length; li++) {
+  allLabels[li].addEventListener('click', function() {
+    setTimeout(updateProgress, 50);
+  });
+}
+
+function finishSession() {
+  for (var i=0; i<IDS.length; i++) {
+    var id=IDS[i];
+    var t=document.getElementById('today-'+id);
+    var l=document.getElementById('last-'+id);
+    if(t&&l){l.checked=t.checked; t.checked=false;}
+  }
+  updateProgress();
+  var el=document.getElementById('lastSession');
+  if(el){var n=new Date(); el.textContent=n.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+}
+
+function resetAll() {
+  for (var i=0; i<IDS.length; i++) {
+    var id=IDS[i];
+    var t=document.getElementById('today-'+id);
+    var l=document.getElementById('last-'+id);
+    if(t) t.checked=false;
+    if(l) l.checked=false;
+  }
+  updateProgress();
+}
+
+function saveText(id) {}
+
+function saveFile() {
+  var updated = document.documentElement.outerHTML;
+  for (var i=0; i<IDS.length; i++) {
+    var id=IDS[i];
+    var n=document.getElementById('name-'+id);
+    var d=document.getElementById('detail-'+id);
+    if(!n||!d) continue;
+    updated=updated.replace(new RegExp('(id="name-'+id+'"[^>]*>)[^<]*(</div>)'),'$1'+n.textContent.trim()+'$2');
+    updated=updated.replace(new RegExp('(id="detail-'+id+'"[^>]*>)[^<]*(</div>)'),'$1'+d.textContent.trim()+'$2');
+  }
+  // iOS: open in new tab — use share sheet to save
+  var blob = new Blob([updated], {type:'text/html'});
+  var url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+}
+
+updateProgress();
+</script>
+</body>
+</html>
